@@ -1,7 +1,7 @@
 {
-  "name": "Happy Birthday Cake Maker",
-  "short_name": "Cake Maker",
-  "description": "Customize your own birthday cake with stickers, music & synced lyrics!",
+  "name": "Happy Birthday Hon",
+  "short_name": "Surprise Gift",
+  "description": "Yu cann customize your birthday cake with stickers too ehehhehehe",
   "start_url": "stickerUpdate2.html",
   "display": "standalone",
   "background_color": "#EDE0D4",

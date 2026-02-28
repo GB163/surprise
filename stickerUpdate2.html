@@ -1,0 +1,2395 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#3A2520">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>Happy Birthday! 🎂</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&display=swap');
+
+    @font-face {
+      font-family: 'Tan Mon Cheri';
+      src: url('TAN_MON_CHERI/Web/TAN-MONCHERI.woff2') format('woff2'),
+        url('TAN_MON_CHERI/Web/TAN-MONCHERI.woff') format('woff'),
+        url('TAN_MON_CHERI/Web/TAN-MONCHERI.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      --burgundy: #3A2520;
+      --burgundy-mid: #4E352E;
+      --burgundy-deep: #2A1A15;
+      --gold: #8A6A30;
+      --black: #1C1C1C;
+      --off-black: #EDE0D4;
+      --surface: #E8DDD0;
+      --surface-2: #DDD2C5;
+      --text: #1C1C1C;
+      --text-muted: #6B5E52;
+      --border: #C4B8AC;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      background: #EDE0D4 url('botanical-bg.png') repeat;
+      background-size: 300px 300px;
+      color: #1C1C1C;
+      overflow: hidden;
+      letter-spacing: 0.5px;
+    }
+
+    /* Allow scrolling on touch / small screens */
+    @media (max-width: 1024px) {
+
+      html,
+      body {
+        overflow: auto;
+        overflow-x: hidden;
+        height: auto;
+        min-height: 100%;
+      }
+    }
+
+    /* ── Floaties ── */
+    .bg-floaties {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .floatie {
+      position: absolute;
+      animation: float-up linear infinite;
+      opacity: 0.08;
+      user-select: none;
+    }
+
+    @keyframes float-up {
+      0% {
+        transform: translateY(110vh) rotate(0deg);
+        opacity: 0.08;
+      }
+
+      100% {
+        transform: translateY(-10vh) rotate(20deg);
+        opacity: 0;
+      }
+    }
+
+    /* ── Music btn ── */
+    #musicBtn {
+      position: absolute;
+      top: 50%;
+      right: 1rem;
+      transform: translateY(-50%);
+      z-index: 200;
+      background: rgba(28, 28, 28, 0.08);
+      color: var(--text);
+      border: 1px solid rgba(28, 28, 28, 0.15);
+      border-radius: 3px;
+      padding: 0.38rem 0.85rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      transition: background 0.18s;
+    }
+
+    #musicBtn:hover {
+      background: rgba(28, 28, 28, 0.15);
+    }
+
+    /* ── Page shell ── */
+    .page {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (max-width: 1024px) {
+      .page {
+        position: relative;
+        min-height: 100vh;
+        min-height: 100dvh;
+      }
+    }
+
+    /* ── Header ── */
+    header {
+      flex-shrink: 0;
+      text-align: center;
+      padding: 0.75rem 1rem 0.6rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    header h1 {
+      font-family: 'Tan Mon Cheri', Georgia, serif;
+      font-size: clamp(1.1rem, 3.6vw, 1.9rem);
+      color: var(--text);
+      letter-spacing: 3px;
+    }
+
+    header p {
+      margin-top: 0.1rem;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+    }
+
+    .bounce {
+      display: inline-block;
+      animation: bounce 1.4s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+
+      0%,
+      100% {
+        transform: translateY(0)
+      }
+
+      50% {
+        transform: translateY(-5px)
+      }
+    }
+
+    /* ── Cake stage ── */
+    .cake-stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      padding: 0.8rem;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #cakeCanvas {
+      border-radius: 3px;
+      background: var(--surface);
+      box-shadow: 0 6px 40px rgba(0, 0, 0, 0.08), 0 0 0 1px var(--border);
+      display: block;
+      /* cursor changes when a sticker is active */
+    }
+
+    #cakeCanvas.placing {
+      cursor: crosshair;
+    }
+
+    #previewHint {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-style: italic;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+    }
+
+    /* Placing indicator badge */
+    #placingBadge {
+      display: none;
+      position: absolute;
+      top: 0.6rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--surface-2);
+      color: var(--text);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 0.3rem 0.8rem;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    #placingBadge.show {
+      display: block;
+    }
+
+    /* ── Controls dock ── */
+    .controls-dock {
+      flex-shrink: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Step nav bar ── */
+    .step-nav {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .step-tab {
+      flex: 1;
+      padding: 0.55rem 0.5rem;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text-muted);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color 0.18s, border-color 0.18s;
+    }
+
+    .step-tab:hover {
+      color: var(--text);
+    }
+
+    .step-tab.active {
+      color: var(--gold);
+      border-bottom-color: var(--gold);
+    }
+
+    /* Scroll strip */
+    .option-strip {
+      flex: 1;
+      display: flex;
+      gap: 0.4rem;
+      overflow-x: auto;
+      padding: 0.22rem 0.15rem 0.4rem;
+      scroll-snap-type: x proximity;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: var(--burgundy) var(--surface-2);
+    }
+
+    .option-strip::-webkit-scrollbar {
+      height: 3px;
+    }
+
+    .option-strip::-webkit-scrollbar-track {
+      background: var(--surface-2);
+    }
+
+    .option-strip::-webkit-scrollbar-thumb {
+      background: var(--burgundy);
+      border-radius: 2px;
+    }
+
+    /* Generic pill */
+    .option-btn {
+      flex: 0 0 auto;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 0.4rem 0.55rem;
+      background: var(--surface-2);
+      cursor: pointer;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      letter-spacing: 0.4px;
+      transition: border-color 0.15s, background 0.15s, transform 0.12s;
+    }
+
+    .option-btn:hover {
+      border-color: var(--burgundy-mid);
+      background: var(--surface);
+      transform: translateY(-1px);
+    }
+
+    .option-btn.selected {
+      border-color: var(--burgundy);
+      background: #D0C4B8;
+      box-shadow: 0 0 0 2px rgba(138, 106, 48, 0.3);
+      color: #1C1C1C;
+    }
+
+    /* Sticker emoji button (bigger touch target) */
+    .sticker-btn {
+      flex: 0 0 auto;
+      scroll-snap-align: start;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 0.3rem 0.4rem;
+      background: var(--surface-2);
+      cursor: pointer;
+      font-size: 1.4rem;
+      line-height: 1;
+      transition: border-color 0.15s, background 0.15s, transform 0.12s;
+    }
+
+    .sticker-btn:hover {
+      border-color: var(--burgundy-mid);
+      background: var(--surface);
+      transform: scale(1.1);
+    }
+
+    .sticker-btn.selected {
+      border-color: var(--gold);
+      background: #D0C4B8;
+      box-shadow: 0 0 0 2px rgba(196, 160, 108, 0.3);
+    }
+
+    /* Colour swatch */
+    .swatch {
+      width: 34px;
+      height: 18px;
+      border-radius: 2px;
+      border: 1px solid rgba(28, 28, 28, 0.1);
+      flex-shrink: 0;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .swatch img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Base swatches — flat */
+    .sw-chocolate {
+      background: #3B1D0A;
+    }
+
+    .sw-vanilla {
+      background: #D4B86A;
+    }
+
+    .sw-redvelvet {
+      background: #6B0A1A;
+    }
+
+    .sw-strawberry {
+      background: #C2405A;
+    }
+
+    .sw-lemon {
+      background: #C8A800;
+    }
+
+    /* Icing swatches — flat */
+    .sw-buttercream {
+      background: #D4AA50;
+    }
+
+    .sw-fondant {
+      background: #7060C0;
+    }
+
+    .sw-whipped {
+      background: #C8C8C8;
+    }
+
+    .sw-ganache {
+      background: #2A1005;
+    }
+
+    .sw-strawberrycream {
+      background: #C03050;
+    }
+
+    /* Upload pill */
+    .upload-btn {
+      flex: 0 0 auto;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      border: 1px dashed var(--border);
+      border-radius: 3px;
+      padding: 0.4rem 0.55rem;
+      background: var(--surface);
+      cursor: pointer;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.73rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      white-space: nowrap;
+      letter-spacing: 0.4px;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+    }
+
+    .upload-btn:hover {
+      border-color: var(--burgundy);
+      background: #F5E8EC;
+      color: var(--text);
+    }
+
+    .upload-btn input {
+      display: none;
+    }
+
+    /* Sticker upload pill */
+    .sticker-upload-btn {
+      flex: 0 0 auto;
+      scroll-snap-align: start;
+      border: 1px dashed var(--border);
+      border-radius: 3px;
+      padding: 0.3rem 0.55rem;
+      background: var(--surface);
+      cursor: pointer;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.73rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+    }
+
+    .sticker-upload-btn:hover {
+      border-color: var(--gold);
+      background: #F5E8EC;
+      color: var(--text);
+    }
+
+    .sticker-upload-btn input {
+      display: none;
+    }
+
+    /* ── Action row ── */
+    .action-row {
+      display: flex;
+      gap: 0.55rem;
+      padding: 0.5rem 0.9rem 0.6rem;
+      justify-content: center;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-wrap: wrap;
+    }
+
+    .btn-finish {
+      padding: 0.55rem 1.5rem;
+      border: 1px solid var(--burgundy);
+      border-radius: 3px;
+      font-family: 'Tan Mon Cheri', serif;
+      font-size: 0.88rem;
+      background: var(--burgundy);
+      color: #EDE0D4;
+      cursor: pointer;
+      letter-spacing: 2px;
+      transition: background 0.18s;
+    }
+
+    .btn-finish:hover {
+      background: var(--burgundy-mid);
+    }
+
+    .btn-download {
+      padding: 0.55rem 1.2rem;
+      border: 1px solid var(--gold);
+      border-radius: 3px;
+      font-family: 'Tan Mon Cheri', serif;
+      font-size: 0.88rem;
+      background: var(--surface-2);
+      color: var(--gold);
+      cursor: pointer;
+      letter-spacing: 1.2px;
+      transition: background 0.18s, color 0.18s;
+    }
+
+    .btn-download:hover {
+      background: var(--gold);
+      color: #FFFFFF;
+    }
+
+    .btn-reset {
+      padding: 0.55rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 700;
+      font-size: 0.84rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: background 0.18s, color 0.18s;
+    }
+
+    .btn-reset:hover {
+      background: var(--surface-2);
+      color: var(--text);
+    }
+
+    /* ── Finish overlay ── */
+    #finishOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      background: rgba(0, 0, 0, 0.5);
+      align-items: center;
+      justify-content: center;
+    }
+
+    #finishOverlay.show {
+      display: flex;
+      animation: fade-in 0.25s;
+    }
+
+    @keyframes fade-in {
+      from {
+        opacity: 0
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    .finish-card {
+      background: var(--surface);
+      border: 1px solid var(--burgundy);
+      border-radius: 3px;
+      padding: 1.7rem 1.5rem;
+      text-align: center;
+      max-width: 340px;
+      width: 90%;
+      box-shadow: 0 20px 70px rgba(0, 0, 0, 0.15);
+      animation: pop-in 0.35s cubic-bezier(.17, .67, .4, 1.3);
+    }
+
+    @keyframes pop-in {
+      from {
+        transform: scale(0.72);
+        opacity: 0
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1
+      }
+    }
+
+    .finish-card h2 {
+      font-family: 'Tan Mon Cheri', serif;
+      font-size: 1.55rem;
+      color: var(--text);
+      letter-spacing: 2px;
+      margin-bottom: 0.45rem;
+    }
+
+    .finish-card p {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    #finishCakePreview {
+      border-radius: 3px;
+      margin: 0.65rem auto;
+      display: block;
+      border: 1px solid var(--border);
+    }
+
+    .finish-summary {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 0.55rem 0.85rem;
+      margin: 0.55rem 0;
+      font-size: 0.84rem;
+      color: var(--text);
+      text-align: left;
+      font-weight: 700;
+      line-height: 1.9;
+    }
+
+    .finish-actions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-top: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-close {
+      padding: 0.5rem 1.6rem;
+      border-radius: 3px;
+      border: 1px solid var(--burgundy);
+      background: var(--burgundy);
+      color: #EDE0D4;
+      font-family: 'Tan Mon Cheri', serif;
+      font-size: 0.84rem;
+      letter-spacing: 1.3px;
+      cursor: pointer;
+      transition: background 0.18s;
+    }
+
+    .btn-close:hover {
+      background: var(--burgundy-mid);
+    }
+
+    .btn-dl-overlay {
+      padding: 0.5rem 1.2rem;
+      border-radius: 3px;
+      border: 1px solid var(--gold);
+      background: var(--surface-2);
+      color: var(--gold);
+      font-family: 'Tan Mon Cheri', serif;
+      font-size: 0.84rem;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: background 0.18s, color 0.18s;
+    }
+
+    .btn-dl-overlay:hover {
+      background: var(--gold);
+      color: var(--black);
+    }
+
+    /* ── Confetti ── */
+    .confetti-piece {
+      position: fixed;
+      pointer-events: none;
+      z-index: 400;
+      animation: confetti-fall 3s ease-in forwards;
+      border-radius: 1px;
+    }
+
+    @keyframes confetti-fall {
+      0% {
+        transform: translateY(-10px) rotate(0deg);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translateY(105vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    /* ── Sticker clear btn ── */
+    #clearStickersBtn {
+      flex: 0 0 auto;
+      scroll-snap-align: start;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 0.3rem 0.55rem;
+      background: transparent;
+      cursor: pointer;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      white-space: nowrap;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    #clearStickersBtn:hover {
+      border-color: var(--burgundy);
+      color: var(--text);
+    }
+
+    /* ════════════════════════════════════════════════════
+     RESPONSIVE — Large tablets (portrait iPads etc.)
+     ════════════════════════════════════════════════════ */
+    @media (max-width: 1024px) {
+      header h1 {
+        font-size: clamp(1rem, 3.2vw, 1.6rem);
+      }
+
+      header p {
+        font-size: 0.8rem;
+      }
+
+      .cake-stage {
+        padding: 0.6rem;
+        gap: 0.35rem;
+      }
+
+      #cakeCanvas {
+        max-width: 90vw;
+      }
+
+      .step-row {
+        padding: 0.5rem 0.65rem;
+      }
+
+      .step-label {
+        width: 60px;
+        font-size: 0.56rem;
+      }
+
+      .step-label span {
+        font-size: 0.6rem;
+      }
+
+      .option-btn {
+        padding: 0.4rem 0.5rem;
+        font-size: 0.74rem;
+      }
+
+      .sticker-btn {
+        font-size: 1.5rem;
+        padding: 0.35rem 0.45rem;
+      }
+
+      .action-row {
+        padding: 0.45rem 0.7rem 0.55rem;
+      }
+
+      .btn-finish,
+      .btn-download {
+        font-size: 0.82rem;
+        padding: 0.5rem 1.2rem;
+      }
+
+      .btn-reset {
+        font-size: 0.8rem;
+      }
+
+      .finish-card {
+        max-width: 380px;
+        padding: 1.4rem 1.2rem;
+      }
+
+      .finish-card h2 {
+        font-size: 1.35rem;
+      }
+
+      #finishCakePreview {
+        width: 160px;
+        height: 172px;
+      }
+    }
+
+    /* ════════════════════════════════════════════════════
+     RESPONSIVE — Small tablets / large phones (481–768)
+     ════════════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      header {
+        padding: 0.6rem 0.8rem 0.5rem;
+      }
+
+      header h1 {
+        font-size: clamp(0.95rem, 4vw, 1.4rem);
+        letter-spacing: 1px;
+      }
+
+      header p {
+        font-size: 0.76rem;
+      }
+
+      #musicBtn {
+        position: static;
+        transform: none;
+        display: inline-block;
+        margin-top: 0.3rem;
+      }
+
+      .cake-stage {
+        flex: none;
+        min-height: 38vh;
+        padding: 0.5rem;
+      }
+
+      #cakeCanvas {
+        max-width: 85vw;
+      }
+
+      .step-label {
+        width: 52px;
+        font-size: 0.52rem;
+      }
+
+      .step-label span {
+        font-size: 0.56rem;
+      }
+
+      .option-strip {
+        gap: 0.35rem;
+        padding: 0.2rem 0.1rem 0.35rem;
+      }
+
+      .option-btn {
+        padding: 0.35rem 0.45rem;
+        font-size: 0.7rem;
+      }
+
+      .swatch {
+        width: 30px;
+        height: 16px;
+      }
+
+      .sticker-btn {
+        font-size: 1.35rem;
+        padding: 0.3rem 0.4rem;
+      }
+
+      .action-row {
+        gap: 0.4rem;
+        padding: 0.4rem 0.6rem 0.5rem;
+      }
+
+      .btn-finish {
+        padding: 0.45rem 1rem;
+        font-size: 0.78rem;
+      }
+
+      .btn-download {
+        padding: 0.45rem 0.9rem;
+        font-size: 0.78rem;
+      }
+
+      .btn-reset {
+        font-size: 0.76rem;
+        padding: 0.45rem 0.8rem;
+      }
+
+      .finish-card {
+        max-width: 320px;
+        padding: 1.2rem 1rem;
+      }
+
+      .finish-card h2 {
+        font-size: 1.25rem;
+      }
+
+      #finishCakePreview {
+        width: 140px;
+        height: 151px;
+      }
+
+      .finish-summary {
+        font-size: 0.78rem;
+        padding: 0.45rem 0.7rem;
+      }
+    }
+
+    /* ════════════════════════════════════════════════════
+     RESPONSIVE — Phones (≤480px)
+     ════════════════════════════════════════════════════ */
+    @media (max-width: 480px) {
+      header {
+        padding: 0.5rem 0.6rem 0.4rem;
+      }
+
+      header h1 {
+        font-size: clamp(0.85rem, 5vw, 1.2rem);
+        letter-spacing: 0.5px;
+      }
+
+      header p {
+        font-size: 0.7rem;
+        margin-top: 0.05rem;
+      }
+
+      #musicBtn {
+        position: static;
+        transform: none;
+        display: inline-block;
+        margin-top: 0.35rem;
+        padding: 0.3rem 0.6rem;
+        font-size: 0.65rem;
+      }
+
+      .cake-stage {
+        flex: none;
+        min-height: 32vh;
+        padding: 0.4rem;
+        gap: 0.3rem;
+      }
+
+      #cakeCanvas {
+        max-width: 92vw;
+      }
+
+      #previewHint {
+        font-size: 0.68rem;
+      }
+
+      #placingBadge {
+        font-size: 0.62rem;
+        padding: 0.22rem 0.6rem;
+      }
+
+      .controls-dock {
+        border-top-width: 1px;
+      }
+
+      .step-row {
+        padding: 0.35rem 0.45rem;
+        flex-wrap: nowrap;
+      }
+
+      .step-label {
+        width: 44px;
+        font-size: 0.48rem;
+        letter-spacing: 1.2px;
+      }
+
+      .step-label span {
+        font-size: 0.52rem;
+      }
+
+      .option-strip {
+        gap: 0.3rem;
+        padding: 0.15rem 0.08rem 0.3rem;
+      }
+
+      .option-btn {
+        padding: 0.3rem 0.38rem;
+        font-size: 0.64rem;
+        gap: 0.18rem;
+        min-height: 2.2rem;
+      }
+
+      .swatch {
+        width: 26px;
+        height: 14px;
+      }
+
+      .sticker-btn {
+        font-size: 1.25rem;
+        padding: 0.28rem 0.35rem;
+        min-width: 2rem;
+        min-height: 2rem;
+      }
+
+      .upload-btn {
+        font-size: 0.64rem;
+        padding: 0.3rem 0.4rem;
+      }
+
+      .sticker-upload-btn {
+        font-size: 0.64rem;
+        padding: 0.25rem 0.4rem;
+      }
+
+      #clearStickersBtn {
+        font-size: 0.62rem;
+        padding: 0.25rem 0.4rem;
+      }
+
+      .action-row {
+        gap: 0.35rem;
+        padding: 0.35rem 0.5rem 0.45rem;
+      }
+
+      .btn-finish {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.72rem;
+        letter-spacing: 1px;
+      }
+
+      .btn-download {
+        padding: 0.4rem 0.7rem;
+        font-size: 0.72rem;
+        letter-spacing: 0.8px;
+      }
+
+      .btn-reset {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.7rem;
+      }
+
+      /* Finish overlay */
+      .finish-card {
+        max-width: 92vw;
+        padding: 1rem 0.8rem;
+      }
+
+      .finish-card h2 {
+        font-size: 1.1rem;
+        letter-spacing: 1px;
+      }
+
+      .finish-card>div:first-child {
+        font-size: 1.5rem;
+      }
+
+      #finishCakePreview {
+        width: 120px;
+        height: 129px;
+      }
+
+      .finish-summary {
+        font-size: 0.72rem;
+        padding: 0.4rem 0.6rem;
+        line-height: 1.7;
+      }
+
+      .finish-card p {
+        font-size: 0.78rem;
+      }
+
+      .finish-actions {
+        gap: 0.35rem;
+      }
+
+      .btn-close {
+        padding: 0.4rem 1rem;
+        font-size: 0.74rem;
+      }
+
+      .btn-dl-overlay {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.74rem;
+      }
+    }
+
+    /* ════════════════════════════════════════════════════
+     RESPONSIVE — Very small phones (≤360px)
+     ════════════════════════════════════════════════════ */
+    @media (max-width: 360px) {
+      header h1 {
+        font-size: 0.85rem;
+      }
+
+      header p {
+        font-size: 0.65rem;
+      }
+
+      .cake-stage {
+        min-height: 28vh;
+      }
+
+      .step-label {
+        width: 38px;
+        font-size: 0.44rem;
+      }
+
+      .step-label span {
+        font-size: 0.5rem;
+      }
+
+      .option-btn {
+        padding: 0.25rem 0.3rem;
+        font-size: 0.58rem;
+      }
+
+      .swatch {
+        width: 22px;
+        height: 12px;
+      }
+
+      .sticker-btn {
+        font-size: 1.1rem;
+        min-width: 1.8rem;
+        min-height: 1.8rem;
+      }
+
+      .btn-finish,
+      .btn-download {
+        font-size: 0.66rem;
+        padding: 0.35rem 0.6rem;
+      }
+
+      .btn-reset {
+        font-size: 0.64rem;
+      }
+
+      .finish-card h2 {
+        font-size: 0.95rem;
+      }
+
+      #finishCakePreview {
+        width: 100px;
+        height: 108px;
+      }
+    }
+
+    /* ════════════════════════════════════════════════════
+     Landscape phones — give more room to cake
+     ════════════════════════════════════════════════════ */
+    @media (max-height: 500px) and (orientation: landscape) {
+      header {
+        padding: 0.3rem 0.6rem 0.25rem;
+      }
+
+      header h1 {
+        font-size: 0.9rem;
+      }
+
+      header p {
+        display: none;
+      }
+
+      .cake-stage {
+        min-height: 30vh;
+        padding: 0.3rem;
+      }
+
+      .step-row {
+        padding: 0.25rem 0.45rem;
+      }
+
+      .action-row {
+        padding: 0.25rem 0.5rem 0.3rem;
+      }
+    }
+
+    /* ── Sticker pack sub-tabs ── */
+    .sticker-packs {
+      display: flex;
+      gap: 0.35rem;
+      padding: 0 0.3rem;
+      flex-shrink: 0;
+      align-items: center;
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      background: var(--surface);
+    }
+
+    .pack-tab {
+      padding: 0.3rem 0.7rem;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .pack-tab:hover {
+      border-color: var(--burgundy-mid);
+      color: var(--text);
+    }
+
+    .pack-tab.active {
+      background: var(--burgundy);
+      border-color: var(--burgundy);
+      color: #EDE0D4;
+    }
+
+    .pack-divider {
+      width: 1px;
+      height: 24px;
+      background: var(--border);
+      flex-shrink: 0;
+      margin: 0 0.15rem;
+    }
+
+    @media (max-width: 480px) {
+      .pack-tab {
+        padding: 0.35rem 0.75rem;
+        font-size: 0.72rem;
+        min-height: 30px;
+      }
+    }
+
+    /* ══════════════════════════════════════════════
+       MUSIC PLAYER
+       ══════════════════════════════════════════════ */
+    .music-player {
+      flex: 1;
+      min-height: 0;
+      background: #1C1C1C;
+      border-top: 2px solid #C4A46C;
+      padding: 0.7rem 1rem 0.6rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .player-song-name {
+      font-family: 'Tan Mon Cheri', serif;
+      font-size: 0.92rem;
+      color: #EDE0D4;
+      letter-spacing: 2px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 90%;
+    }
+
+    .player-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .player-btn {
+      background: none;
+      border: none;
+      color: #EDE0D4;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0.25rem;
+      transition: transform 0.15s, color 0.15s;
+      line-height: 1;
+    }
+
+    .player-btn:hover {
+      color: #C4A46C;
+      transform: scale(1.15);
+    }
+
+    .player-btn:active {
+      transform: scale(0.9);
+      transition: transform 0.05s;
+    }
+
+    .player-btn.play-pause {
+      font-size: 1.3rem;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: #C4A46C;
+      color: #1C1C1C;
+      border: 2px solid rgba(237, 224, 212, 0.2);
+    }
+
+    .player-btn.play-pause:hover {
+      background: #D4B87C;
+      color: #1C1C1C;
+      transform: scale(1.1);
+    }
+
+    .player-btn.play-pause:active {
+      transform: scale(0.9);
+      transition: transform 0.05s;
+    }
+
+    .player-progress-row {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .player-time {
+      font-size: 0.6rem;
+      color: #9A8E82;
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 700;
+      min-width: 32px;
+      text-align: center;
+    }
+
+    .player-progress {
+      flex: 1;
+      height: 4px;
+      background: rgba(237, 224, 212, 0.15);
+      border-radius: 2px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .player-progress-fill {
+      height: 100%;
+      background: #C4A46C;
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.2s linear;
+    }
+
+    .lyrics-viewer {
+      width: 100%;
+      max-width: 420px;
+      height: 60px;
+      overflow: hidden;
+      text-align: center;
+      background: rgba(237, 224, 212, 0.06);
+      border-radius: 4px;
+      padding: 0.3rem 0.6rem;
+      margin-top: 0.15rem;
+      position: relative;
+    }
+
+    .lyrics-track {
+      transition: transform 0.45s cubic-bezier(0.25, 0.1, 0.25, 1);
+      will-change: transform;
+    }
+
+    .lyrics-line {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.78rem;
+      color: #9A8E82;
+      line-height: 1.7;
+      transition: color 0.3s, opacity 0.3s;
+      opacity: 0.5;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .lyrics-line.active {
+      color: #EDE0D4;
+      font-weight: 700;
+      opacity: 1;
+    }
+
+    /* Mobile tweaks */
+    @media (max-width: 480px) {
+      .music-player {
+        padding: 0.4rem 0.6rem;
+        gap: 0.2rem;
+      }
+
+      .player-song-name {
+        font-size: 0.72rem;
+      }
+
+      .player-btn.play-pause {
+        width: 32px;
+        height: 32px;
+        font-size: 1.2rem;
+      }
+
+      .lyrics-viewer {
+        max-height: 50px;
+      }
+
+      .lyrics-line {
+        font-size: 0.7rem;
+      }
+
+      .lyrics-line.active {
+        font-size: 0.76rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="bg-floaties" id="bgFloaties"></div>
+  <audio id="playerAudio"></audio>
+
+  <div class="page">
+
+    <header>
+      <h1><span class="bounce">🎂</span> Happy Birthday, <span id="herName">Babes</span>!</h1>
+      <p>Let's bake a cake togetherrrrr</p>
+    </header>
+
+    <div class="cake-stage">
+      <div id="placingBadge">Click the cake to place sticker</div>
+      <canvas id="cakeCanvas"></canvas>
+      <div id="previewHint">Choose your base to get started!</div>
+    </div>
+
+    <div class="controls-dock">
+
+      <div class="step-nav">
+        <button class="step-tab active" data-step="base">Base</button>
+        <button class="step-tab" data-step="icing">Icing</button>
+        <button class="step-tab" data-step="candles">Candles</button>
+        <button class="step-tab" data-step="stickers">Stickers</button>
+      </div>
+
+      <div class="option-strip" id="optionStrip"></div>
+
+      <div class="action-row">
+        <button class="btn-finish" id="finishBtn">Finish!</button>
+        <button class="btn-download" id="downloadBtn">⬇ Save JPG</button>
+        <button class="btn-reset" id="resetBtn">↺ Reset</button>
+      </div>
+
+    </div>
+
+    <!-- ── MUSIC PLAYER ── -->
+    <div class="music-player" id="musicPlayer">
+      <div class="player-song-name" id="playerSongName">No songs loaded</div>
+      <div class="player-controls">
+        <button class="player-btn" id="prevBtn" title="Previous">⏮</button>
+        <button class="player-btn play-pause" id="playPauseBtn" title="Play / Pause">▶</button>
+        <button class="player-btn" id="nextBtn" title="Next">⏭</button>
+      </div>
+      <div class="player-progress-row">
+        <span class="player-time" id="playerCurrentTime">0:00</span>
+        <div class="player-progress" id="playerProgress">
+          <div class="player-progress-fill" id="playerProgressFill"></div>
+        </div>
+        <span class="player-time" id="playerTotalTime">0:00</span>
+      </div>
+      <div class="lyrics-viewer" id="lyricsViewer">
+        <div class="lyrics-line" style="color:var(--text-muted);font-style:italic;">♫ lyrics will appear here ♫</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Finish overlay -->
+  <div id="finishOverlay">
+    <div class="finish-card">
+      <div style="font-size:1.9rem">🎂✨</div>
+      <h2>It's Ready!</h2>
+      <canvas id="finishCakePreview" width="180" height="194"></canvas>
+      <div class="finish-summary" id="finishSummary"></div>
+      <p id="finishMsg"></p>
+      <div class="finish-actions">
+        <button class="btn-dl-overlay" id="dlOverlayBtn">⬇ Save JPG</button>
+        <button class="btn-close" id="closeOverlay">💖 Yay!</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================================
+    // CUSTOMISE
+    // ============================================================
+    const HER_NAME = "Honey";    // ← Change to her name!
+    const FINISH_MSG = `Your custom cake is ready!<br>I love you so much, ${HER_NAME}! 💕`;
+
+    document.getElementById("herName").textContent = HER_NAME;
+    document.getElementById("finishMsg").innerHTML = FINISH_MSG;
+
+    // ============================================================
+    // DATA
+    // ============================================================
+    const BASES = [
+      { id: "chocolate", label: "Chocolate", sw: "sw-chocolate" },
+      { id: "vanilla", label: "Vanilla", sw: "sw-vanilla" },
+      { id: "redvelvet", label: "Red Velvet", sw: "sw-redvelvet" },
+      { id: "strawberry", label: "Strawberry", sw: "sw-strawberry" },
+      { id: "lemon", label: "Lemon", sw: "sw-lemon" },
+    ];
+    const ICINGS = [
+      { id: "buttercream", label: "Buttercream", sw: "sw-buttercream" },
+      { id: "fondant", label: "Fondant", sw: "sw-fondant" },
+      { id: "whipped", label: "Whipped", sw: "sw-whipped" },
+      { id: "ganache", label: "Ganache", sw: "sw-ganache" },
+      { id: "strawberrycream", label: "Strawberry", sw: "sw-strawberrycream" },
+    ];
+    const CANDLES = [
+      { id: "none", label: "None" },
+      { id: "pink", label: "Pink" },
+      { id: "rainbow", label: "Rainbow" },
+      { id: "gold", label: "Gold" },
+    ];
+
+    // Sticker emoji options
+    const EMOJI_STICKERS = [
+      "🌹", "💖", "✨", "🎀", "🎉", "🍓", "🌸", "💝", "🦋", "🌺",
+      "⭐", "🍒", "🎊", "💫", "🌷", "🍰", "💌", "🎈", "🥂", "🌙",
+    ];
+
+    // Canvas flat colours for placeholder art
+    const BASE_COL = {
+      chocolate: { body: "#3B1D0A", side: "#2A1206", text: "Chocolate" },
+      vanilla: { body: "#C8A030", side: "#A07820", text: "Vanilla" },
+      redvelvet: { body: "#6B0A1A", side: "#4A0610", text: "Red Velvet" },
+      strawberry: { body: "#C2405A", side: "#922035", text: "Strawberry" },
+      lemon: { body: "#C8A800", side: "#9A8000", text: "Lemon" },
+    };
+    const ICING_COL = {
+      buttercream: { top: "#C89030", drip: "#A07020" },
+      fondant: { top: "#5048A0", drip: "#3830708" },
+      whipped: { top: "#B0B0B0", drip: "#888888" },
+      ganache: { top: "#1A0A04", drip: "#0A0402" },
+      strawberrycream: { top: "#A82040", drip: "#801028" },
+    };
+    const CANDLE_PAL = {
+      none: [],
+      pink: ["#C24080", "#C24080", "#C24080"],
+      rainbow: ["#C03030", "#C06010", "#A09000", "#207030", "#2040A0", "#6030A0"],
+      gold: ["#A07820", "#A07820", "#A07820"],
+    };
+
+    // ============================================================
+    // STATE
+    // ============================================================
+    let state = {
+      base: null, icing: null, candles: "none",
+      baseImg: null, icingImg: null,
+      stickers: [],          // [{type:'emoji'|'image', value, x, y, size, img?}]
+      pendingSticker: null,  // sticker ready to be placed by clicking canvas
+    };
+
+    // ============================================================
+    // TABBED CONTROLS – Nav bar + single shared strip
+    // ============================================================
+    let activeStep = "base";
+
+    function showStep(step) {
+      activeStep = step;
+      const strip = document.getElementById("optionStrip");
+      strip.innerHTML = "";
+
+      // Update tab active states
+      document.querySelectorAll(".step-tab").forEach(t => {
+        t.classList.toggle("active", t.dataset.step === step);
+      });
+
+      if (step === "base" || step === "icing" || step === "candles") {
+        const items = step === "base" ? BASES : step === "icing" ? ICINGS : CANDLES;
+        const stateKey = step === "base" ? "base" : step === "icing" ? "icing" : "candles";
+        const uploadLabel = step === "candles" ? null : "Custom";
+
+        items.forEach(item => {
+          const btn = document.createElement("button");
+          btn.className = "option-btn";
+          btn.dataset.id = item.id;
+          btn.innerHTML = item.sw
+            ? `<span class="swatch ${item.sw}"></span>${item.label}`
+            : item.label;
+          if (state[stateKey] === item.id) btn.classList.add("selected");
+          btn.addEventListener("click", () => {
+            strip.querySelectorAll(".option-btn").forEach(b => b.classList.remove("selected"));
+            btn.classList.add("selected");
+            state[stateKey] = item.id;
+            redraw();
+          });
+          strip.appendChild(btn);
+        });
+
+        if (uploadLabel) {
+          const imgId = stateKey + "UploadThumb";
+          const label = document.createElement("label");
+          label.className = "upload-btn";
+          label.innerHTML = `
+        <span class="swatch"><img id="${imgId}" style="display:none" alt=""></span>
+        📎 ${uploadLabel}
+        <input type="file" accept="image/*">
+      `;
+          // Restore thumbnail if already uploaded
+          if (state[stateKey + "Img"]) {
+            const thumb = label.querySelector("img");
+            thumb.src = state[stateKey + "Img"].src;
+            thumb.style.display = "block";
+          }
+          label.querySelector("input").addEventListener("change", function () {
+            if (!this.files[0]) return;
+            loadImage(this.files[0], img => {
+              state[stateKey + "Img"] = img;
+              document.getElementById(imgId).src = img.src;
+              document.getElementById(imgId).style.display = "block";
+              strip.querySelectorAll(".option-btn").forEach(b => b.classList.remove("selected"));
+              state[stateKey] = null;
+              redraw();
+            });
+          });
+          strip.appendChild(label);
+        }
+
+      } else if (step === "stickers") {
+        let activePack = "emojis";
+
+        // Pack tabs
+        const packsDiv = document.createElement("div");
+        packsDiv.className = "sticker-packs";
+        const emojiTab = document.createElement("button");
+        emojiTab.className = "pack-tab active";
+        emojiTab.textContent = "Emojis";
+        packsDiv.appendChild(emojiTab);
+        const yujiTab = document.createElement("button");
+        yujiTab.className = "pack-tab";
+        yujiTab.textContent = "Yuji";
+        packsDiv.appendChild(yujiTab);
+        strip.appendChild(packsDiv);
+
+        // Divider
+        const divEl = document.createElement("div");
+        divEl.className = "pack-divider";
+        strip.appendChild(divEl);
+
+        // Sticker area
+        const stickerArea = document.createElement("div");
+        stickerArea.style.cssText = "display:flex;gap:0.35rem;align-items:center;";
+        strip.appendChild(stickerArea);
+
+        function loadPack(pack) {
+          activePack = pack;
+          stickerArea.innerHTML = "";
+          emojiTab.classList.toggle("active", pack === "emojis");
+          yujiTab.classList.toggle("active", pack === "yuji");
+
+          if (pack === "emojis") {
+            EMOJI_STICKERS.forEach(emoji => {
+              const btn = document.createElement("button");
+              btn.className = "sticker-btn";
+              btn.textContent = emoji;
+              btn.title = "Click to select, then click the cake to place";
+              btn.addEventListener("click", () => {
+                if (btn.classList.contains("selected")) {
+                  deactivatePlacingMode();
+                  return;
+                }
+                strip.querySelectorAll(".sticker-btn,.sticker-upload-btn").forEach(b => b.classList.remove("selected"));
+                btn.classList.add("selected");
+                state.pendingSticker = { type: "emoji", value: emoji };
+                activatePlacingMode();
+              });
+              stickerArea.appendChild(btn);
+            });
+          } else {
+            const IMAGE_STICKERS = [
+              "Images/stickers/yujisticker1.png",
+              "Images/stickers/yujisticker2.png",
+              "Images/stickers/yujisticker3.png",
+              "Images/stickers/yujisticker4.png",
+              "Images/stickers/yujisticker5.png",
+              "Images/stickers/yujisticker6.png",
+            ];
+            IMAGE_STICKERS.forEach(src => {
+              const btn = document.createElement("button");
+              btn.className = "sticker-btn";
+              btn.title = "Click to select, then click the cake to place";
+              btn.style.padding = "3px";
+              const thumb = document.createElement("img");
+              thumb.src = src;
+              thumb.style.cssText = "width:32px;height:32px;object-fit:contain;border-radius:2px;pointer-events:none;";
+              btn.appendChild(thumb);
+              btn.addEventListener("click", () => {
+                if (btn.classList.contains("selected")) {
+                  deactivatePlacingMode();
+                  return;
+                }
+                strip.querySelectorAll(".sticker-btn,.sticker-upload-btn").forEach(b => b.classList.remove("selected"));
+                btn.classList.add("selected");
+                const img = new Image();
+                img.onload = () => {
+                  state.pendingSticker = { type: "image", img };
+                  activatePlacingMode();
+                };
+                img.src = src;
+              });
+              stickerArea.appendChild(btn);
+            });
+          }
+
+          // Gallery upload
+          const gLabel = document.createElement("label");
+          gLabel.className = "sticker-upload-btn";
+          gLabel.innerHTML = `🖼 Gallery <input type="file" accept="image/*">`;
+          gLabel.querySelector("input").addEventListener("change", function () {
+            if (!this.files[0]) return;
+            loadImage(this.files[0], img => {
+              strip.querySelectorAll(".sticker-btn,.sticker-upload-btn").forEach(b => b.classList.remove("selected"));
+              gLabel.classList.add("selected");
+              state.pendingSticker = { type: "image", img };
+              activatePlacingMode();
+            });
+          });
+          stickerArea.appendChild(gLabel);
+
+          // Clear button
+          const clearBtn = document.createElement("button");
+          clearBtn.id = "clearStickersBtn";
+          clearBtn.textContent = "✕ Clear";
+          clearBtn.title = "Remove all stickers";
+          clearBtn.addEventListener("click", () => {
+            state.stickers = [];
+            redraw();
+          });
+          stickerArea.appendChild(clearBtn);
+        }
+
+        emojiTab.addEventListener("click", () => loadPack("emojis"));
+        yujiTab.addEventListener("click", () => loadPack("yuji"));
+        loadPack("emojis");
+      }
+    }
+
+    // Tab click listeners
+    document.querySelectorAll(".step-tab").forEach(tab => {
+      tab.addEventListener("click", () => showStep(tab.dataset.step));
+    });
+
+    // Init: show base step, set candles default
+    state.candles = "none";
+    showStep("base");
+
+    // ============================================================
+    // PLACING MODE
+    // ============================================================
+    const canvas = document.getElementById("cakeCanvas");
+    const badge = document.getElementById("placingBadge");
+
+    function activatePlacingMode() {
+      canvas.classList.add("placing");
+      badge.classList.add("show");
+    }
+    function deactivatePlacingMode() {
+      canvas.classList.remove("placing");
+      badge.classList.remove("show");
+      document.querySelectorAll(".sticker-btn,.sticker-upload-btn").forEach(b => b.classList.remove("selected"));
+      state.pendingSticker = null;
+    }
+
+    // Click canvas → place sticker OR do nothing
+    canvas.addEventListener("click", function (e) {
+      if (!state.pendingSticker) return;
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const x = (e.clientX - rect.left) * scaleX;
+      const y = (e.clientY - rect.top) * scaleY;
+
+      const ps = state.pendingSticker;
+      const sticker = {
+        ...ps,
+        nx: x / canvas.width,
+        ny: y / canvas.height,
+        nsize: ps.type === "emoji" ? 0.11 : 0.18,
+      };
+      // For image stickers, store natural dimensions for proper aspect ratio
+      if (ps.type === "image" && ps.img) {
+        sticker.natW = ps.img.naturalWidth || ps.img.width;
+        sticker.natH = ps.img.naturalHeight || ps.img.height;
+      }
+      state.stickers.push(sticker);
+      redraw();
+      // Stay in placing mode — sticker remains selected for repeated placement
+    });
+
+    // ESC cancels placing
+    document.addEventListener("keydown", e => { if (e.key === "Escape") deactivatePlacingMode(); });
+
+    // ============================================================
+    // HELPER: load image from File
+    // ============================================================
+    function loadImage(file, cb) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => cb(img);
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // ============================================================
+    // DRAW CAKE
+    // ============================================================
+    function drawCakeInto(ctx, w, h, includeStickers = true) {
+      // Scale factor — all hardcoded sizes are relative to a 300px reference
+      const s = w / 300;
+
+      // flat background
+      ctx.fillStyle = "#EDE0D4";
+      ctx.fillRect(0, 0, w, h);
+
+      const { base, icing, candles, baseImg, icingImg } = state;
+
+      /* ── No base → placeholder ── */
+      if (!base && !baseImg) {
+        const cakeW = w * 0.72, cakeH = h * 0.40;
+        const cakeX = (w - cakeW) / 2, cakeY = h * 0.44;
+        ctx.strokeStyle = "#C4B8AC"; ctx.lineWidth = 1.5 * s; ctx.setLineDash([6 * s, 4 * s]);
+        ctx.strokeRect(cakeX, cakeY, cakeW, cakeH); ctx.setLineDash([]);
+        ctx.fillStyle = "#6B5E52";
+        ctx.font = `${Math.round(12 * s)}px 'Cormorant Garamond',serif`; ctx.textAlign = "center";
+        ctx.fillText("Choose a base ↓", w / 2, cakeY + cakeH / 2 + 4 * s);
+        const hintEl = document.getElementById("previewHint");
+        if (hintEl) hintEl.textContent = "Choose your base to get started!";
+        return;
+      }
+
+      const bc = base ? BASE_COL[base] : { body: "#C8A030", side: "#A07820" };
+      const ic = icing ? ICING_COL[icing] : null;
+
+      /* ── 3-TIER GEOMETRY ── */
+      const plateY = h * 0.88;
+      const tiers = [
+        { w: w * 0.68, h: h * 0.20, y: plateY - h * 0.20, r: 6 * s },
+        { w: w * 0.50, h: h * 0.17, y: plateY - h * 0.39, r: 5 * s },
+        { w: w * 0.32, h: h * 0.14, y: plateY - h * 0.55, r: 4 * s },
+      ];
+      tiers.forEach(t => { t.x = (w - t.w) / 2; });
+
+      /* ── PLATE ── */
+      ctx.fillStyle = "#F0D6D0";
+      ctx.beginPath(); ctx.ellipse(w / 2, plateY, w * 0.40, h * 0.035, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#F8E8E4";
+      ctx.beginPath(); ctx.ellipse(w / 2, plateY - h * 0.008, w * 0.37, h * 0.025, 0, 0, Math.PI * 2); ctx.fill();
+
+      /* ── DRAW EACH TIER (base) ── */
+      tiers.forEach((t) => {
+        if (baseImg) {
+          ctx.save();
+          ctx.beginPath(); ctx.roundRect(t.x, t.y, t.w, t.h, t.r); ctx.clip();
+          ctx.drawImage(baseImg, t.x, t.y, t.w, t.h);
+          ctx.restore();
+        } else {
+          ctx.fillStyle = bc.side;
+          ctx.beginPath(); ctx.roundRect(t.x, t.y + 4 * s, t.w, t.h, t.r); ctx.fill();
+          ctx.fillStyle = bc.body;
+          ctx.beginPath(); ctx.roundRect(t.x, t.y, t.w, t.h - 3 * s, t.r); ctx.fill();
+          ctx.globalAlpha = 0.05; ctx.fillStyle = "#000";
+          for (let i = 0; i < t.h; i += 7 * s) ctx.fillRect(t.x, t.y + i, t.w, 3 * s);
+          ctx.globalAlpha = 1;
+        }
+      });
+
+      /* ── ICING ON EACH TIER ── */
+      if (icingImg) {
+        tiers.forEach((t) => {
+          const ih = t.h * 0.35;
+          ctx.save();
+          ctx.beginPath(); ctx.roundRect(t.x, t.y - ih * 0.3, t.w, ih + ih * 0.3, [t.r, t.r, 0, 0]); ctx.clip();
+          ctx.drawImage(icingImg, t.x, t.y - ih * 0.3, t.w, ih + ih * 0.3);
+          ctx.restore();
+        });
+      } else if (ic) {
+        tiers.forEach((t, ti) => {
+          const ih = t.h * 0.32;
+          ctx.fillStyle = ic.top;
+          ctx.beginPath(); ctx.roundRect(t.x, t.y - ih * 0.15, t.w, ih, [t.r, t.r, 0, 0]); ctx.fill();
+          // Drips
+          ctx.fillStyle = ic.drip;
+          const dripCount = Math.round(t.w / (16 * s));
+          for (let i = 0; i <= dripCount; i++) {
+            const dx = t.x + (t.w / dripCount) * i;
+            const dl = (8 + Math.sin(i * 2.3 + ti) * 5) * s;
+            ctx.beginPath(); ctx.ellipse(dx, t.y + ih * 0.7 + dl / 2, 4 * s, dl / 2, 0, 0, Math.PI * 2); ctx.fill();
+          }
+        });
+      } else {
+        tiers.forEach((t) => {
+          const ih = t.h * 0.32;
+          ctx.fillStyle = "rgba(58,37,32,0.08)";
+          ctx.beginPath(); ctx.roundRect(t.x, t.y - ih * 0.15, t.w, ih, [t.r, t.r, 0, 0]); ctx.fill();
+        });
+        ctx.fillStyle = "#6B5E52"; ctx.font = `${Math.round(9 * s)}px 'Cormorant Garamond',serif`; ctx.textAlign = "center";
+        ctx.fillText("Choose icing ↓", w / 2, tiers[1].y + tiers[1].h / 2);
+      }
+
+
+
+      /* ── CANDLES (on top tier) ── */
+      const palette = CANDLE_PAL[candles || "none"];
+      if (palette.length) {
+        const topT = tiers[2];
+        palette.forEach((color, i) => {
+          const n = palette.length;
+          const cx = topT.x + (topT.w / (n + 1)) * (i + 1);
+          const cy = topT.y - (ic ? topT.h * 0.32 * 0.15 : 0);
+          const c = candles === "rainbow" ? ["#C03030", "#C06010", "#A09000", "#207030", "#2040A0", "#6030A0"][i % 6] : color;
+          ctx.fillStyle = c;
+          ctx.beginPath(); ctx.roundRect(cx - 3 * s, cy - 20 * s, 6 * s, 20 * s, 2 * s); ctx.fill();
+          ctx.fillStyle = "#C09000"; ctx.beginPath(); ctx.ellipse(cx, cy - 26 * s, 3.5 * s, 6 * s, 0, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = "#E0A000"; ctx.beginPath(); ctx.ellipse(cx, cy - 24 * s, 2 * s, 3.5 * s, 0, 0, Math.PI * 2); ctx.fill();
+        });
+      }
+
+      /* ── STICKERS ── */
+      if (includeStickers) {
+        state.stickers.forEach(s => {
+          const sx = s.nx * w;
+          const sy = s.ny * h;
+          const sz = Math.round(s.nsize * w);
+          if (s.type === "emoji") {
+            ctx.font = `${sz}px serif`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(s.value, sx, sy);
+            ctx.textBaseline = "alphabetic";
+          } else if (s.type === "image" && s.img) {
+            // Use natural aspect ratio — sz controls the max dimension
+            let dw = sz, dh = sz;
+            if (s.natW && s.natH) {
+              const aspect = s.natW / s.natH;
+              if (aspect > 1) { dh = sz / aspect; } else { dw = sz * aspect; }
+            }
+            ctx.drawImage(s.img, sx - dw / 2, sy - dh / 2, dw, dh);
+          }
+        });
+      }
+
+      /* ── HINT ── */
+      const hints = [];
+      if (!base && !baseImg) hints.push("base");
+      if (!icing && !icingImg) hints.push("icing");
+      const hint = document.getElementById("previewHint");
+      if (hint) hint.textContent =
+        hints.length ? `Choose your ${hints.join(" & ")} to continue!` : "Looking delicious! 🤤";
+    }
+
+    function redraw() {
+      const stage = document.querySelector(".cake-stage");
+      // On small screens allow bigger canvas relative to viewport
+      const vw = window.innerWidth;
+      let maxSize = 320;
+      if (vw <= 480) maxSize = Math.min(vw * 0.85, 280);
+      else if (vw <= 768) maxSize = Math.min(vw * 0.65, 300);
+      else if (vw <= 1024) maxSize = Math.min(vw * 0.55, 340);
+      const size = Math.min(stage.clientWidth - 24, stage.clientHeight - 44, maxSize);
+      canvas.width = canvas.height = Math.max(size, 120);
+      drawCakeInto(canvas.getContext("2d"), canvas.width, canvas.height);
+    }
+
+    // ============================================================
+    // DOWNLOAD AS JPG
+    // ============================================================
+    function downloadJPG(sourceCanvasId, filename) {
+      // Render a fresh copy at 600px for a decent resolution download
+      const dlCanvas = document.createElement("canvas");
+      dlCanvas.width = dlCanvas.height = 600;
+      drawCakeInto(dlCanvas.getContext("2d"), 600, 600);
+      const link = document.createElement("a");
+      link.download = filename || "my-birthday-cake.jpg";
+      link.href = dlCanvas.toDataURL("image/jpeg", 0.92);
+      link.click();
+    }
+
+    document.getElementById("downloadBtn").addEventListener("click", () => {
+      if (!state.base && !state.baseImg) { alert("Build your cake first! 🎂"); return; }
+      downloadJPG("cakeCanvas", "birthday-cake.jpg");
+    });
+
+    // ============================================================
+    // FINISH BUTTON
+    // ============================================================
+    document.getElementById("finishBtn").addEventListener("click", () => {
+      if (!state.base && !state.baseImg) { alert("Please choose a cake base first! 🎂"); return; }
+
+      const prev = document.getElementById("finishCakePreview");
+      prev.width = 180; prev.height = 194;
+      drawCakeInto(prev.getContext("2d"), 180, 194);
+
+      const baseName = state.baseImg ? "Custom Drawing" : (BASES.find(b => b.id === state.base)?.label || "—");
+      const icingName = state.icingImg ? "Custom Drawing" : (ICINGS.find(b => b.id === state.icing)?.label || "Not chosen");
+      const candleName = CANDLES.find(c => c.id === state.candles)?.label || "None";
+      const stickerCount = state.stickers.length;
+      document.getElementById("finishSummary").innerHTML =
+        `🎂 Base: ${baseName}<br>🍦 Icing: ${icingName}<br>🕯️ Candles: ${candleName}<br>✨ Stickers: ${stickerCount}`;
+
+      document.getElementById("finishOverlay").classList.add("show");
+      launchConfetti();
+    });
+
+    document.getElementById("dlOverlayBtn").addEventListener("click", () => {
+      downloadJPG("cakeCanvas", "birthday-cake.jpg");
+    });
+    document.getElementById("closeOverlay").addEventListener("click", () =>
+      document.getElementById("finishOverlay").classList.remove("show"));
+    document.getElementById("finishOverlay").addEventListener("click", function (e) {
+      if (e.target === this) this.classList.remove("show");
+    });
+
+    // ============================================================
+    // RESET
+    // ============================================================
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      state = { base: null, icing: null, candles: "none", baseImg: null, icingImg: null, stickers: [], pendingSticker: null };
+      document.querySelectorAll(".option-btn").forEach(b => b.classList.remove("selected"));
+      document.querySelector("#candleStrip .option-btn[data-id='none']").classList.add("selected");
+      document.querySelectorAll(".upload-btn img").forEach(img => { img.style.display = "none"; img.src = ""; });
+      document.querySelectorAll("input[type=file]").forEach(i => i.value = "");
+      document.getElementById("previewHint").textContent = "Choose your base to get started!";
+      deactivatePlacingMode();
+      redraw();
+    });
+
+    // ============================================================
+    // CONFETTI
+    // ============================================================
+    function launchConfetti() {
+      const colors = ["#3A2520", "#8A6A30", "#C4B8AC", "#1C1C1C", "#6B5E52", "#EDE0D4"];
+      for (let i = 0; i < 90; i++) {
+        const el = document.createElement("div");
+        el.className = "confetti-piece";
+        el.style.cssText = `
+      left:${Math.random() * 100}vw; top:-10px;
+      width:${5 + Math.random() * 8}px; height:${5 + Math.random() * 8}px;
+      background:${colors[Math.floor(Math.random() * colors.length)]};
+      border-radius:${Math.random() > .5 ? "50%" : "1px"};
+      animation-delay:${Math.random() * 1.5}s;
+      animation-duration:${2.2 + Math.random() * 1.5}s;
+    `;
+        document.body.appendChild(el);
+        el.addEventListener("animationend", () => el.remove());
+      }
+    }
+
+    // ============================================================
+    // BACKGROUND FLOATIES
+    // ============================================================
+    const floatIcons = ["🌹", "🎈", "🎀", "✨", "🍓", "🌸", "💝", "🎉", "💖", "🦋"];
+    const fc = document.getElementById("bgFloaties");
+    for (let i = 0; i < 18; i++) {
+      const el = document.createElement("div");
+      el.className = "floatie";
+      el.textContent = floatIcons[Math.floor(Math.random() * floatIcons.length)];
+      el.style.cssText = `
+    left:${Math.random() * 100}vw;
+    font-size:${0.9 + Math.random() * 1.1}rem;
+    animation-duration:${11 + Math.random() * 13}s;
+    animation-delay:${Math.random() * 15}s;
+  `;
+      fc.appendChild(el);
+    }
+
+    // ============================================================
+    // MUSIC PLAYER
+    // ============================================================
+    const PLAYLIST = [
+      {
+        title: "Harleys in Hawaii",
+        src: "music/Harleys in Hawaii.mp3",
+        lyrics: [
+          { t: 0.83, text: "♫ ♫ ♫ ♫" },
+          { t: 6.92, text: "Boy, tell me, can you take my breath away?" },
+          { t: 10.93, text: "Cruisin' down a heart-shaped highway" },
+          { t: 14.02, text: "Got you swervin' lane-to-lane, don't hit the brakes" },
+          { t: 18.07, text: "'Cause I'm feelin' so safe" },
+          { t: 20.09, text: "I'll be your baby, on a Sunday" },
+          { t: 23.48, text: "Oh, why don't we get out of town?" },
+          { t: 26.9, text: "Call me your baby, on the same wave" },
+          { t: 30.47, text: "Oh, no, no, there's no slowin' down" },
+          { t: 34.5, text: "You and I, I" },
+          { t: 36.31, text: "Ridin' Harleys in Hawaii-i-i" },
+          { t: 39.63, text: "I'm on the back, I'm holdin' tight, I" },
+          { t: 43.01, text: "Want you to take me for a ri-ide, ride" },
+          { t: 47.81, text: "When I hula-hula, hula" },
+          { t: 49.93, text: "So good, you'll take me to the jeweler-jeweler, jeweler" },
+          { t: 53.27, text: "There's pink and purple in the sky-y-y" },
+          { t: 56.76, text: "We're ridin' Harleys in Hawaii-i-i" },
+          { t: 62.34, text: "Let me run my fingers through your salty hair" },
+          { t: 66.2, text: "Go ahead, explore the island" },
+          { t: 68.92, text: "Vibes so real that you can feel it in the air" },
+          { t: 72.53, text: "I'm revvin' up your engine" },
+          { t: 74.89, text: "I'll be your baby, on a Sunday" },
+          { t: 78.49, text: "Oh, why don't we get out of town?" },
+          { t: 81.58, text: "Call me your baby, catch the same wave" },
+          { t: 85.45, text: "Oh, no, no, there's no slowin' down" },
+          { t: 89.28, text: "You and I, I" },
+          { t: 91.81, text: "Ridin' Harleys in Hawaii-i-i" },
+          { t: 94.43, text: "I'm on the back, I'm holdin' tight, I" },
+          { t: 97.86, text: "Want you to take me for a ri-ide, ride" },
+          { t: 102.54, text: "When I hula-hula, hula" },
+          { t: 104.96, text: "So good, you'll take me to the jeweler-jeweler, jeweler" },
+          { t: 108.01, text: "There's pink and purple in the sky-y-y" },
+          { t: 111.58, text: "We're ridin' Harleys in Hawaii-i-i" },
+          { t: 121.82, text: "No, no" },
+          { t: 136.35, text: "You and I" },
+          { t: 140.2, text: "Ridin' Harleys in Hawaii-i-i" },
+          { t: 142.63, text: "I'm on the back, I'm holdin' tight, I" },
+          { t: 146.03, text: "Want you to take me for a ri-ide, ride" },
+          { t: 150.49, text: "When I hula-hula, hula" },
+          { t: 153.01, text: "So good, you'll take me to the jeweler-jeweler, jeweler" },
+          { t: 156.43, text: "There's pink and purple in the sky-y-y" },
+          { t: 159.81, text: "We're ridin' Harleys in Hawaii-i-i" },
+          { t: 164.46, text: "I'll be your baby, on a Sunday" },
+          { t: 167.55, text: "Oh, whoa" },
+          { t: 170.92, text: "We're ridin' Harleys in Hawaii-i" },
+          { t: 172.03, text: "Call me your baby, catch the same wave" },
+          { t: 174.44, text: "Oh, whoa" },
+          { t: 177.05, text: "We're ridin' Harleys in Hawaii-i" },
+        ]
+      },
+      {
+        title: "Teenage Dream",
+        src: "music/Teenage Dream.mp3",
+        lyrics: [
+          { t: 0.3, text: "♫ ♫ ♫ ♫" },
+          { t: 17.77, text: "You think I'm pretty without any makeup on" },
+          { t: 22.08, text: "You think I'm funny when I tell the punchline wrong" },
+          { t: 26.27, text: "I know you get me" },
+          { t: 28.03, text: "So I let my walls come down, yeah, come down" },
+          { t: 34.94, text: "Before you met me" },
+          { t: 36.89, text: "Yeah, I was alright, but things were kinda heavy" },
+          { t: 40.63, text: "You brought me to life, now every February" },
+          { t: 45.12, text: "Yeah, you'll be my Valentine, Valentine" },
+          { t: 50.76, text: "So let's go all the way tonight" },
+          { t: 55.33, text: "No regrets, just love" },
+          { t: 59.14, text: "Yeah, we can dance until we die" },
+          { t: 63.93, text: "You and I will be young forever" },
+          { t: 68.47, text: "'Cause you make me" },
+          { t: 71.23, text: "Feel like I'm living a teenage dream" },
+          { t: 75.54, text: "The way you turn me on, I can't sleep" },
+          { t: 79.79, text: "Let's run away and don't ever look back, ever look back, oh" },
+          { t: 86, text: "My heart stops when you look at me" },
+          { t: 90.28, text: "Just one touch, now, baby, I believe" },
+          { t: 94.56, text: "This is real" },
+          { t: 97.19, text: "So take a chance and don't ever look back, ever look back, oh" },
+          { t: 105.94, text: "We drove to Cali and got drunk on the beach" },
+          { t: 110.02, text: "Got a motel and built a fort out of sheets" },
+          { t: 114.19, text: "I finally found you, my missing puzzle piece" },
+          { t: 119.4, text: "I'm complete" },
+          { t: 121.62, text: "And I'ma get your heart racing in my skin-tight jeans" },
+          { t: 126.2, text: "Be your teenage dream tonight" },
+          { t: 130.29, text: "Let you put your hands on me, in my skin-tight jeans" },
+          { t: 134.76, text: "Be your teenage dream tonight" },
+          { t: 139.12, text: "Oh, 'cause you make me" },
+          { t: 142, text: "Feel like I'm living a teenage dream" },
+          { t: 146.13, text: "The way you turn me on, I can't sleep" },
+          { t: 150.54, text: "Let's run away and don't ever look back, ever look back, oh" },
+          { t: 156.33, text: "My heart stops when you look at me" },
+          { t: 160.82, text: "Just one touch, now, baby, I believe" },
+          { t: 165.23, text: "This is real" },
+          { t: 167.89, text: "So take a chance and don't ever look back, ever look back, oh" },
+          { t: 174.28, text: "(This song reminds me of you TuT)" },
+        ]
+      },
+      {
+        title: "Treehouse",
+        src: "music/Treehouse.mp3",
+        lyrics: [
+          { t: 0.3, text: "♫ ♫ ♫ ♫" },
+          { t: 13.59, text: "\"Do Not Enter\" is written on the doorway" },
+          { t: 17.01, text: "Why can't everyone just go away?" },
+          { t: 20.28, text: "Except you, you can stay" },
+          { t: 26.68, text: "What do you think of my treehouse?" },
+          { t: 30.15, text: "This where I sit and talk really loud" },
+          { t: 33.2, text: "Usually, I'm all by myself" },
+          { t: 37.85, text: "♫ ♫ ♫ ♫" },
+          { t: 46.14, text: "Ooh, ooh-ooh" },
+          { t: 66.1, text: "I'm the captain, but you can be the deputy" },
+          { t: 69.19, text: "I'm really glad you think I'm so funny" },
+          { t: 72.51, text: "I don't think I'm ever gonna let you leave" },
+          { t: 79, text: "\"Do Not Enter\" is written on the doorway" },
+          { t: 82.29, text: "Why can't everyone just go away?" },
+          { t: 85.46, text: "Except you, oh, you can stay" },
+          { t: 91.88, text: "What do you think of my treehouse?" },
+          { t: 95.28, text: "This is where I sit and talk real, real loud" },
+          { t: 98.77, text: "Usually, I'm all by myself" },
+          { t: 110.95, text: "Ooh, ooh-ooh" },
+          { t: 131.13, text: "I'm the captain, but you can be the deputy" },
+          { t: 134.43, text: "I'm really glad you think I'm so funny" },
+          { t: 138, text: "I don't think I'm ever gonna let you leave" },
+        ]
+      },
+      {
+        title: "her — JVKE",
+        src: "music/her.mp3",
+        lyrics: [
+          { t: 0.19, text: "♫ ♫ ♫ ♫" },
+          { t: 6.71, text: "(Hold me close) Look me dead in my eyes" },
+          { t: 10.14, text: "(Dead in my) 'Til the day that I die" },
+          { t: 13.49, text: "(Dead inside) I just wanna feel alive" },
+          { t: 16.66, text: "(With you, I'm alive) With you, I'm alive" },
+          { t: 20.07, text: "Fell in love, but it left me lonely" },
+          { t: 23.37, text: "Tried to trust, but it burned me slowly" },
+          { t: 27.64, text: "I didn't know what I was looking for" },
+          { t: 30.83, text: "'Til I found" },
+          { t: 33.22, text: "Her" },
+          { t: 38.15, text: "I found her" },
+          { t: 44.9, text: "Without her" },
+          { t: 47.43, text: "I'm a mess (I'm a mess)" },
+          { t: 48.96, text: "There was nothing 'bout that love that made sense, I was stressed" },
+          { t: 51.23, text: "'Til I found her (Oh, oh)" },
+          { t: 59.94, text: "I've run for many miles trying to find love" },
+          { t: 63.14, text: "From a woman that could love me and never leave my side" },
+          { t: 66.5, text: "And I've run for many miles trying to get away from" },
+          { t: 70, text: "The things I'm afraid of and everything inside" },
+          { t: 73.78, text: "You say that we're already done (Done)" },
+          { t: 75.65, text: "But what does that even mean?" },
+          { t: 77.27, text: "You tell me to open my eyes" },
+          { t: 79.09, text: "Thank God it was just a dream" },
+          { t: 80.62, text: "I guess that's how you know that it's love" },
+          { t: 82.46, text: "When you're scared to death they'll leave" },
+          { t: 84.18, text: "Just say that you'll never leave, never leave" },
+          { t: 86.46, text: "(Baby, hold me close) Look me dead in my eyes" },
+          { t: 89.9, text: "(Dead in my) 'Til the day that I die" },
+          { t: 93.29, text: "(Dead inside) I just wanna feel alive" },
+          { t: 96.55, text: "(With you, I'm alive) With you, I'm a—, uh" },
+          { t: 99.1, text: "Fell in love, but it left me lonely" },
+          { t: 103.63, text: "Tried to trust, but it burned me slowly" },
+          { t: 107.41, text: "I didn't know what I was looking for" },
+          { t: 110.74, text: "'Til I found" },
+          { t: 113.11, text: "Her" },
+          { t: 118.12, text: "I found her" },
+          { t: 125.16, text: "Without her" },
+          { t: 127.3, text: "I'm a mess (I'm a mess)" },
+          { t: 128.5, text: "There was nothing 'bout that love that made sense, I was stressed" },
+          { t: 131.44, text: "'Til I found her (Oh, oh)" },
+          { t: 138.38, text: "Without her" },
+          { t: 141, text: "I'm a mess (I'm a mess)" },
+          { t: 142.28, text: "There was nothing 'bout that love that made sense, I was stressed" },
+          { t: 144.66, text: "'Til I found her (Oh, oh)" },
+          { t: 151.47, text: "'Til I found her" },
+          { t: 158.73, text: "Ooh-ooh-ooh" },
+        ]
+      },
+    ];
+
+    const playerAudio = document.getElementById("playerAudio");
+    const songNameEl = document.getElementById("playerSongName");
+    const playPauseBtn = document.getElementById("playPauseBtn");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const progressBar = document.getElementById("playerProgress");
+    const progressFill = document.getElementById("playerProgressFill");
+    const currentTimeEl = document.getElementById("playerCurrentTime");
+    const totalTimeEl = document.getElementById("playerTotalTime");
+    const lyricsViewer = document.getElementById("lyricsViewer");
+
+    let currentTrack = 0;
+    let isPlaying = false;
+
+    function formatTime(sec) {
+      if (!sec || isNaN(sec)) return "0:00";
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${m}:${s.toString().padStart(2, "0")}`;
+    }
+
+    function loadTrack(index) {
+      currentTrack = ((index % PLAYLIST.length) + PLAYLIST.length) % PLAYLIST.length;
+      const track = PLAYLIST[currentTrack];
+      playerAudio.src = track.src;
+      songNameEl.textContent = track.title;
+      progressFill.style.width = "0%";
+      currentTimeEl.textContent = "0:00";
+      totalTimeEl.textContent = "0:00";
+      renderLyrics(track.lyrics);
+    }
+
+    function renderLyrics(lyrics) {
+      lyricsViewer.innerHTML = '<div class="lyrics-track" id="lyricsTrack"></div>';
+      const track = document.getElementById("lyricsTrack");
+      lyrics.forEach((line, i) => {
+        const div = document.createElement("div");
+        div.className = "lyrics-line";
+        div.textContent = line.text;
+        div.dataset.index = i;
+        track.appendChild(div);
+      });
+    }
+
+    function updateLyrics() {
+      const track = PLAYLIST[currentTrack];
+      const time = playerAudio.currentTime;
+      const lyricsTrack = document.getElementById("lyricsTrack");
+      if (!lyricsTrack) return;
+      const lines = lyricsTrack.querySelectorAll(".lyrics-line");
+      let activeIdx = 0;
+      for (let i = track.lyrics.length - 1; i >= 0; i--) {
+        if (time >= track.lyrics[i].t) { activeIdx = i; break; }
+      }
+      lines.forEach((el, i) => {
+        el.classList.toggle("active", i === activeIdx);
+      });
+      // Smooth transform to center the active line
+      const activeLine = lines[activeIdx];
+      if (activeLine) {
+        const viewerH = lyricsViewer.clientHeight;
+        const lineTop = activeLine.offsetTop;
+        const lineH = activeLine.offsetHeight;
+        const offset = -(lineTop - (viewerH / 2) + (lineH / 2));
+        lyricsTrack.style.transform = `translateY(${offset}px)`;
+      }
+    }
+
+    // Play / Pause
+    playPauseBtn.addEventListener("click", () => {
+      isPlaying = !isPlaying;
+      playPauseBtn.textContent = isPlaying ? "⏸" : "▶";
+      if (isPlaying) {
+        playerAudio.play().catch(() => { });
+      } else {
+        playerAudio.pause();
+      }
+    });
+
+    playerAudio.addEventListener("play", () => {
+      isPlaying = true;
+      playPauseBtn.textContent = "⏸";
+    });
+
+    playerAudio.addEventListener("pause", () => {
+      isPlaying = false;
+      playPauseBtn.textContent = "▶";
+    });
+
+    // Prev / Next
+    prevBtn.addEventListener("click", () => {
+      loadTrack(currentTrack - 1);
+      if (isPlaying) playerAudio.play().catch(() => { });
+    });
+
+    nextBtn.addEventListener("click", () => {
+      loadTrack(currentTrack + 1);
+      if (isPlaying) playerAudio.play().catch(() => { });
+    });
+
+    // Auto-advance to next song when current ends
+    playerAudio.addEventListener("ended", () => {
+      loadTrack(currentTrack + 1);
+      playerAudio.play().catch(() => { });
+    });
+
+    // Progress bar update
+    playerAudio.addEventListener("timeupdate", () => {
+      if (playerAudio.duration) {
+        const pct = (playerAudio.currentTime / playerAudio.duration) * 100;
+        progressFill.style.width = pct + "%";
+        currentTimeEl.textContent = formatTime(playerAudio.currentTime);
+      }
+      updateLyrics();
+    });
+
+    playerAudio.addEventListener("loadedmetadata", () => {
+      totalTimeEl.textContent = formatTime(playerAudio.duration);
+    });
+
+    // Click to seek
+    progressBar.addEventListener("click", (e) => {
+      const rect = progressBar.getBoundingClientRect();
+      const pct = (e.clientX - rect.left) / rect.width;
+      if (playerAudio.duration) {
+        playerAudio.currentTime = pct * playerAudio.duration;
+      }
+    });
+
+    // Init first track
+    loadTrack(0);
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    redraw();
+    window.addEventListener("resize", redraw);
+  </script>
+  <script>
+    // Register Service Worker for offline access
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('[PWA] Service Worker registered', reg.scope))
+        .catch(err => console.warn('[PWA] SW registration failed', err));
+    }
+  </script>
+</body>
+
+</html>
